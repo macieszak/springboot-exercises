@@ -49,5 +49,5 @@ public class EmployeeRestTController {
         employeeService.deleteById(employeeId);
         return STR."Deleted employee, id - \{employeeId}";
     }
-    
+
 }
