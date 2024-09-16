@@ -20,9 +20,9 @@ public class InstructorDetail {
     public InstructorDetail() {
     }
 
-    public InstructorDetail(int id, String youtubeChannel) {
-        this.id = id;
+    public InstructorDetail(String youtubeChannel, String hobby) {
         this.youtubeChannel = youtubeChannel;
+        this.hobby = hobby;
     }
 
     public int getId() {
@@ -48,5 +48,5 @@ public class InstructorDetail {
     public void setHobby(String hobby) {
         this.hobby = hobby;
     }
-    
+
 }
