@@ -2,9 +2,8 @@ package com.example.aop_demo.aspect;
 
 import com.example.aop_demo.Account;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -15,6 +14,50 @@ import java.util.List;
 @Component
 @Order(2)
 public class MyDemoLoggingAspect {
+
+    @Around("execution(* com.example.aop_demo.service.*.getFortune(..))")
+    public Object aroundGetFortune(
+            ProceedingJoinPoint theProceedingJoinPoint) throws Throwable {
+
+        // print out method we are advising on
+        String method = theProceedingJoinPoint.getSignature().toShortString();
+        System.out.println("\n=====>>> Executing @Around on method: " + method);
+
+        // get begin timestamp
+        long begin = System.currentTimeMillis();
+
+        Object result = null;
+
+        try {
+            result = theProceedingJoinPoint.proceed();
+        }
+        catch (Exception exc) {
+            // log the exception
+            System.out.println(exc.getMessage());
+
+            // give user a custom message
+            //result = "Major accident! But no worries, your private AOP helicopter is on the way!";
+
+            throw exc;
+        }
+
+        // get end timestamp
+        long end = System.currentTimeMillis();
+
+        // compute duration and display it
+        long duration = end - begin;
+        System.out.println("\n=====> Duration: " + duration / 1000.0 + " seconds");
+
+        return result;
+    }
+
+    @After("execution(* com.example.aop_demo.dao.AccountDAOImpl.findAccounts(..))")
+    public void afterFinallyFindAccountsAdvice(JoinPoint theJoinPoint) {
+
+        // print out which method we are advising on
+        String method = theJoinPoint.getSignature().toShortString();
+        System.out.println("\n=====>>> Executing @After (finally) on method: " + method);
+    }
 
     @AfterReturning(
             pointcut = "execution(* com.example.aop_demo.dao.AccountDAOImpl.findAccounts(..)))",
@@ -28,8 +71,6 @@ public class MyDemoLoggingAspect {
         convertAccountNamesToUpperCase(result);
 
         System.out.println("\n=====> result is:  " + result);
-
-
     }
 
     private void convertAccountNamesToUpperCase(List<Account> result) {
@@ -58,8 +99,6 @@ public class MyDemoLoggingAspect {
                 System.out.println("acccount level: " + account.getLevel());
             }
         }
-
-
     }
 
 
